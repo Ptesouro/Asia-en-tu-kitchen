@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asian Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --cream:#FAFAF7;
+  --wood:#8B6B47;--wood-light:#C4A882;--wood-lighter:#EDE0D0;
+  --green:#3B6D11;--green-light:#EAF3DE;--green-mid:#639922;
+  --text:#2C2C2A;--text-muted:#888780;
+  --border:#D3D1C7;--surface:#F5F3EE;--white:#ffffff;
+  --red:#A32D2D;--red-light:#FCEBEB;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px}
+h1,h2,h3,.brand{font-family:'Lora',serif}
+input,button,select{font-family:'DM Sans',sans-serif}
+
+/* ── AUTH ── */
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.auth-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.auth-logo{width:64px;height:64px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+.auth-logo i{font-size:28px;color:var(--green)}
+.auth-card h2{font-size:22px;margin-bottom:.25rem}
+.auth-card > p{color:var(--text-muted);font-size:13px;margin-bottom:2rem}
+.field-wrap{position:relative;margin-bottom:.75rem;text-align:left}
+.field-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:17px;pointer-events:none}
+.auth-field{width:100%;padding:11px 14px 11px 38px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--white);color:var(--text);outline:none;transition:border .15s}
+.auth-field:focus{border-color:var(--green-mid)}
+.auth-btn{width:100%;padding:12px;background:var(--green);color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;margin-top:.5rem}
+.auth-btn:hover{background:var(--green-mid)}
+.auth-err{color:var(--red);font-size:12px;margin:.4rem 0;display:none;text-align:left}
+.auth-hint{margin-top:1rem;font-size:12px;color:var(--text-muted);background:var(--surface);border-radius:8px;padding:.6rem 1rem;text-align:left;line-height:1.7}
+
+/* ── APP SHELL ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100}
+.brand{font-size:18px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.brand i{color:var(--green);font-size:20px}
+.topbar-nav{display:flex;gap:4px}
+.nav-btn{background:none;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;color:var(--text-muted);transition:all .15s;display:flex;align-items:center;gap:6px}
+.nav-btn:hover{background:var(--surface);color:var(--text)}
+.nav-btn.active{background:var(--green-light);color:var(--green);font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;background:var(--wood-lighter);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--wood)}
+.user-label{font-size:13px;color:var(--text-muted)}
+.logout-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--text-muted);transition:all .15s}
+.logout-btn:hover{background:var(--surface);color:var(--text)}
+
+/* ── MAIN ── */
+main{flex:1;padding:2rem;max-width:1100px;width:100%;margin:0 auto}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:2rem}
+.page-header h2{font-size:26px;margin-bottom:.3rem}
+.page-header p{color:var(--text-muted);font-size:14px}
+
+/* ── RECIPE CONTROLS ── */
+.recipe-controls{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.chip{padding:6px 16px;border-radius:20px;font-size:13px;border:1px solid var(--border);background:var(--white);cursor:pointer;transition:all .15s;color:var(--text-muted)}
+.chip:hover{border-color:var(--green-mid);color:var(--green)}
+.chip.active{background:var(--green-light);border-color:var(--green-mid);color:var(--green);font-weight:500}
+.random-btn{background:var(--wood);color:white;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s;white-space:nowrap}
+.random-btn:hover{background:var(--wood-light)}
+
+/* ── RECIPE GRID ── */
+.recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+.recipe-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.recipe-card:hover{transform:translateY(-3px);border-color:var(--wood-light);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.recipe-thumb{width:100%;height:160px;background:linear-gradient(135deg,var(--wood-lighter) 0%,var(--green-light) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--wood);position:relative}
+.recipe-thumb i{font-size:36px;opacity:.4}
+.recipe-thumb-label{font-size:11px;opacity:.5}
+.lock-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.45);color:white;border-radius:6px;padding:3px 8px;font-size:11px;display:flex;align-items:center;gap:4px}
+.recipe-body{padding:1rem 1.25rem 1.25rem}
+.recipe-body h3{font-size:15px;color:var(--text);margin-bottom:.3rem}
+.recipe-meta{display:flex;gap:12px;font-size:12px;color:var(--text-muted);margin-bottom:.4rem}
+.recipe-meta span{display:flex;align-items:center;gap:4px}
+.recipe-origin{display:inline-block;padding:2px 9px;background:var(--surface);border-radius:10px;font-size:11px;color:var(--text-muted);margin-bottom:.4rem}
+.recipe-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:.5rem}
+.match-ok{font-size:12px;color:var(--green);font-weight:500}
+.match-partial{font-size:12px;color:var(--wood);font-weight:500}
+.match-none{font-size:12px;color:var(--text-muted)}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:620px;margin:auto}
+.modal-hdr{padding:1.5rem 1.5rem 0;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.modal-hdr h2{font-size:22px;line-height:1.3}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:6px;font-size:20px;flex-shrink:0;line-height:1}
+.modal-close:hover{background:var(--surface)}
+.modal-thumb{width:100%;height:220px;background:linear-gradient(135deg,var(--wood-lighter),var(--green-light));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--wood);margin:1rem 0}
+.modal-thumb i{font-size:52px;opacity:.35}
+.modal-thumb span{font-size:12px;opacity:.45}
+.modal-body{padding:0 1.5rem 2rem}
+.modal-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem}
+.modal-chip{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:5px}
+.modal-desc{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:1.25rem}
+.modal-section h4{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.75rem;font-weight:500}
+.modal-section{margin-bottom:1.5rem}
+.ing-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ing-tag{padding:4px 11px;border-radius:12px;font-size:13px;background:var(--green-light);color:var(--green)}
+.ing-tag.miss{background:var(--red-light);color:var(--red)}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;margin-bottom:.85rem;font-size:14px;line-height:1.65;color:var(--text)}
+.steps li::before{content:counter(s);min-width:26px;height:26px;background:var(--green-light);color:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin-top:1px;flex-shrink:0}
+
+/* ── RANDOM MODAL ── */
+.rand-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.rand-bg.open{display:flex}
+.rand-card{background:var(--white);border-radius:16px;width:100%;max-width:460px;padding:2rem;text-align:center}
+.rand-card h3{font-size:20px;margin-bottom:.25rem}
+.rand-card > p{color:var(--text-muted);font-size:13px;margin-bottom:1.5rem}
+.rand-thumb{width:100%;height:160px;background:linear-gradient(135deg,var(--wood-lighter),var(--green-light));border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--wood);margin-bottom:1.25rem}
+.rand-thumb i{font-size:40px;opacity:.35}
+.rand-thumb span{font-size:11px;opacity:.45}
+.rand-name{font-size:20px;font-family:'Lora',serif;margin-bottom:.4rem}
+.rand-desc{font-size:13px;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6}
+.rand-btns{display:flex;gap:10px;justify-content:center}
+.btn-sec{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px;transition:background .15s}
+.btn-sec:hover{background:var(--surface)}
+.btn-pri{background:var(--green);color:white;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s}
+.btn-pri:hover{background:var(--green-mid)}
+
+/* ── ALACENA ── */
+.pantry-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2rem}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}
+.stat-num{font-size:26px;font-weight:500;font-family:'Lora',serif;color:var(--text)}
+.stat-label{font-size:12px;color:var(--text-muted);margin-top:3px}
+.search-wrap{position:relative;margin-bottom:1.5rem}
+.search-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:18px;pointer-events:none}
+.pantry-search{width:100%;padding:10px 14px 10px 42px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--white);color:var(--text);outline:none;transition:border .15s}
+.pantry-search:focus{border-color:var(--green-mid)}
+.pantry-cats{display:flex;flex-direction:column;gap:1.75rem}
+.cat-header{display:flex;align-items:center;gap:10px;margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.cat-header h3{font-size:15px}
+.cat-count{font-size:12px;color:var(--text-muted);background:var(--surface);padding:2px 9px;border-radius:10px}
+.pantry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.p-item{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s}
+.p-item:hover{border-color:var(--wood-light)}
+.p-item.stocked{border-color:var(--green-mid);background:var(--green-light)}
+.p-name{font-size:13px;color:var(--text);flex:1;margin-right:.5rem}
+.p-item.stocked .p-name{color:var(--green);font-weight:500}
+.qty-ctrl{display:flex;align-items:center;gap:5px}
+.qty-btn{width:24px;height:24px;border:1.5px solid var(--border);background:var(--white);border-radius:5px;cursor:pointer;font-size:15px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;line-height:1}
+.qty-btn:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
+.qty-inp{width:38px;border:1.5px solid var(--border);border-radius:5px;text-align:center;font-size:13px;padding:3px 0;background:var(--white);color:var(--text);outline:none;transition:border .15s}
+.qty-inp:focus{border-color:var(--green-mid)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--green);color:white;padding:10px 18px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:400}
+.toast.show{opacity:1}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:4rem 2rem;color:var(--text-muted);grid-column:1/-1}
+.empty i{font-size:48px;margin-bottom:1rem;display:block;opacity:.35}
+.empty p{font-size:15px}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH ══ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo"><i class="ti ti-bowl"></i></div>
+    <h2>Asian Kitchen</h2>
+    <p>Ingresá con tu cuenta para ver tus recetas</p>
+    <div class="field-wrap">
+      <i class="ti ti-user"></i>
+      <input class="auth-field" id="au" type="text" placeholder="Usuario" autocomplete="username">
+    </div>
+    <div class="field-wrap">
+      <i class="ti ti-lock"></i>
+      <input class="auth-field" id="ap" type="password" placeholder="Contraseña" autocomplete="current-password">
+    </div>
+    <div class="auth-err" id="auth-err"><i class="ti ti-alert-circle"></i> Usuario o contraseña incorrectos</div>
+    <button class="auth-btn" id="login-btn">Entrar</button>
+    <div class="auth-hint">
+      <strong>Demo:</strong><br>
+      usuario: <strong>admin</strong> &nbsp;/&nbsp; contraseña: <strong>1234</strong><br>
+      usuario: <strong>chef</strong> &nbsp;/&nbsp; contraseña: <strong>asiatica</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <nav class="topbar">
+    <div class="brand"><i class="ti ti-bowl"></i> Asian Kitchen</div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" id="nav-recetas" onclick="goTo('recetas')">
+        <i class="ti ti-chef-hat"></i> Recetas
+      </button>
+      <button class="nav-btn" id="nav-alacena" onclick="goTo('alacena')">
+        <i class="ti ti-basket"></i> Alacena
+      </button>
+    </div>
+    <div class="topbar-right">
+      <div class="user-avatar" id="u-avatar">A</div>
+      <span class="user-label" id="u-label">admin</span>
+      <button class="logout-btn" onclick="logout()">Salir</button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- RECETAS -->
+    <section class="page active" id="page-recetas">
+      <div class="page-header">
+        <h2>Recetas Asiáticas</h2>
+        <p>Encontrá qué podés cocinar con lo que tenés en tu alacena</p>
+      </div>
+      <div class="recipe-controls">
+        <div class="filter-chips">
+          <button class="chip active" data-f="todas" onclick="setFilter(this)">Todas</button>
+          <button class="chip" data-f="posible" onclick="setFilter(this)">Puedo hacer ahora</button>
+          <button class="chip" data-f="japonesa" onclick="setFilter(this)">Japonesa</button>
+          <button class="chip" data-f="china" onclick="setFilter(this)">China</button>
+          <button class="chip" data-f="tailandesa" onclick="setFilter(this)">Tailandesa</button>
+          <button class="chip" data-f="coreana" onclick="setFilter(this)">Coreana</button>
+        </div>
+        <button class="random-btn" onclick="showRandom()">
+          <i class="ti ti-dice"></i> Receta aleatoria
+        </button>
+      </div>
+      <div class="recipe-grid" id="recipe-grid"></div>
+    </section>
+
+    <!-- ALACENA -->
+    <section class="page" id="page-alacena">
+      <div class="page-header">
+        <h2>Mi Alacena</h2>
+        <p>Administrá tus ingredientes — la app actualiza las recetas en tiempo real</p>
+      </div>
+      <div class="pantry-stats">
+        <div class="stat-card"><div class="stat-num" id="s-disponibles">0</div><div class="stat-label">Ingredientes disponibles</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-posibles">0</div><div class="stat-label">Recetas que podés hacer</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total de ingredientes</div></div>
+      </div>
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input class="pantry-search" id="pantry-q" type="text" placeholder="Buscar ingrediente..." oninput="renderPantry()">
+      </div>
+      <div class="pantry-cats" id="pantry-cats"></div>
+    </section>
+  </main>
+</div>
+
+<!-- RECIPE MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal-box">
+    <div class="modal-hdr">
+      <h2 id="m-title"></h2>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-thumb"><i class="ti ti-photo"></i><span>[ imagen de la receta — placeholder ]</span></div>
+    <div class="modal-body">
+      <div class="modal-chips" id="m-chips"></div>
+      <p class="modal-desc" id="m-desc"></p>
+      <div class="modal-section">
+        <h4>Ingredientes</h4>
+        <div class="ing-tags" id="m-ings"></div>
+      </div>
+      <div class="modal-section">
+        <h4>Preparación</h4>
+        <ol class="steps" id="m-steps"></ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RANDOM MODAL -->
+<div class="rand-bg" id="rand-bg">
+  <div class="rand-card">
+    <h3>🎲 Receta aleatoria</h3>
+    <p>Basada en los ingredientes de tu alacena</p>
+    <div class="rand-thumb"><i class="ti ti-photo"></i><span>[ imagen — placeholder ]</span></div>
+    <div class="rand-name" id="r-name"></div>
+    <div class="rand-desc" id="r-desc"></div>
+    <div class="rand-btns">
+      <button class="btn-sec" onclick="showRandom()"><i class="ti ti-refresh"></i> Otra</button>
+      <button class="btn-pri" onclick="openFromRandom()">Ver receta completa</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check"></i> Alacena guardada</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const USERS = [{u:'admin',p:'1234'},{u:'chef',p:'asiatica'}];
+
+const CATS = [
+  {cat:'Proteínas', items:['Pollo','Carne de res','Cerdo','Tofu','Camarones','Huevo','Salmón','Atún (lata)','Tempeh','Seitan']},
+  {cat:'Fideos y arroces', items:['Arroz jazmín','Arroz sushi','Fideos ramen','Fideos soba','Fideos udon','Fideos de arroz','Fideos de vidrio','Fideos de huevo']},
+  {cat:'Salsas y condimentos', items:['Salsa de soja','Salsa de ostras','Salsa de pescado','Salsa hoisin','Pasta de miso','Pasta de curry rojo','Pasta de curry verde','Sriracha','Vinagre de arroz','Aceite de sésamo','Aceite de chile']},
+  {cat:'Verduras y frescos', items:['Bok choy','Brotes de soja','Ajo','Jengibre','Cebolla de verdeo','Pimiento rojo','Pimiento verde','Zanahoria','Repollo napa','Espinaca','Pepino','Berenjena','Setas shiitake','Setas enoki']},
+  {cat:'Lácteos y otros refrigerados', items:['Leche de coco','Crema de coco','Manteca de maní','Pasta de tahini']},
+  {cat:'Secos y especias', items:['Dashi en polvo','Algas nori','Semillas de sésamo','Anís estrellado','Canela','Cúrcuma','Comino','Cinco especias','Copos de chile','Maicena','Harina de arroz']},
+  {cat:'Bebidas y base', items:['Sake','Mirin','Caldo de pollo','Caldo de vegetales','Azúcar','Aceite vegetal']}
+];
+
+const RECIPES = [
+  {id:1,name:'Ramen Tonkotsu',origin:'japonesa',time:'45 min',diff:'Media',
+   desc:'Caldo cremoso de cerdo con fideos ramen, huevo marinado y cebolla de verdeo.',
+   ings:['Fideos ramen','Cerdo','Huevo','Caldo de pollo','Salsa de soja','Ajo','Jengibre','Cebolla de verdeo','Aceite de sésamo','Semillas de sésamo'],
+   steps:['Hervir el caldo de pollo con ajo, jengibre y salsa de soja por 20 minutos.','Cocinar el cerdo lentamente hasta que esté tierno y reservar el caldo resultante.','Mezclar ambos caldos y ajustar el sabor con aceite de sésamo.','Cocinar los fideos ramen según las instrucciones del paquete.','Servir los fideos en el caldo con huevo, cebolla de verdeo y semillas de sésamo.']},
+  {id:2,name:'Pad Thai',origin:'tailandesa',time:'20 min',diff:'Fácil',
+   desc:'Saltado de fideos de arroz con camarones, brotes y salsa de tamarindo.',
+   ings:['Fideos de arroz','Camarones','Huevo','Brotes de soja','Salsa de pescado','Vinagre de arroz','Azúcar','Cebolla de verdeo','Manteca de maní','Aceite vegetal','Semillas de sésamo'],
+   steps:['Remojar los fideos de arroz en agua fría por 30 minutos.','Calentar el wok con aceite a fuego alto y saltear los camarones hasta rosados.','Hacer espacio en el wok, agregar el huevo y revolver.','Incorporar los fideos y condimentar con salsa de pescado, vinagre y azúcar.','Agregar brotes de soja y cebolla de verdeo. Servir con maní y sésamo.']},
+  {id:3,name:'Bibimbap',origin:'coreana',time:'30 min',diff:'Fácil',
+   desc:'Cuenco de arroz con verduras salteadas, carne y huevo frito.',
+   ings:['Arroz jazmín','Carne de res','Huevo','Zanahoria','Espinaca','Salsa de soja','Aceite de sésamo','Ajo','Semillas de sésamo','Aceite vegetal'],
+   steps:['Cocinar el arroz jazmín según las instrucciones.','Saltear la carne con salsa de soja, ajo y aceite de sésamo hasta dorar.','Blanquear la espinaca 1 minuto y saltear la zanahoria juliana.','Freír el huevo con la yema blanda.','Servir todo sobre el arroz y mezclar con gochujang antes de comer.']},
+  {id:4,name:'Gyozas de Cerdo',origin:'japonesa',time:'40 min',diff:'Media',
+   desc:'Dumplings crujientes de cerdo y repollo, dorados y al vapor.',
+   ings:['Cerdo','Repollo napa','Ajo','Jengibre','Salsa de soja','Aceite de sésamo','Cebolla de verdeo','Aceite vegetal','Maicena'],
+   steps:['Mezclar el cerdo picado con repollo, ajo, jengibre, salsa de soja y aceite de sésamo.','Rellenar las tapas de gyoza y sellar los bordes con los dedos humedecidos.','Calentar aceite en sartén y colocar las gyozas en fila.','Dorar la base 2 minutos, agregar agua, tapar y cocinar al vapor 5 minutos.','Servir con salsa de soja mezclada con vinagre de arroz.']},
+  {id:5,name:'Curry Verde Tailandés',origin:'tailandesa',time:'35 min',diff:'Fácil',
+   desc:'Curry aromático con leche de coco, pollo y verduras frescas.',
+   ings:['Pollo','Pasta de curry verde','Leche de coco','Pimiento rojo','Bok choy','Salsa de pescado','Azúcar','Aceite vegetal','Arroz jazmín'],
+   steps:['Saltear la pasta de curry verde en aceite caliente hasta que desprenda aroma.','Agregar el pollo en trozos y dorar levemente por fuera.','Incorporar la leche de coco y cocinar a fuego medio 15 minutos.','Añadir pimientos y bok choy, cocinar 5 minutos más.','Condimentar con salsa de pescado y azúcar. Servir con arroz jazmín.']},
+  {id:6,name:'Sushi de Atún',origin:'japonesa',time:'50 min',diff:'Difícil',
+   desc:'Rolls de atún con arroz de sushi, nori y wasabi.',
+   ings:['Arroz sushi','Atún (lata)','Algas nori','Vinagre de arroz','Azúcar','Semillas de sésamo','Salsa de soja'],
+   steps:['Cocinar el arroz sushi y condimentar con vinagre de arroz, azúcar y sal mientras está caliente.','Dejar enfriar el arroz y extenderlo sobre el nori con manos mojadas.','Colocar el atún en tiras en el centro y enrollar firmemente con la estera.','Cortar el roll en 8 piezas con cuchillo bien afilado y mojado.','Servir con salsa de soja, wasabi y jengibre encurtido.']},
+  {id:7,name:'Fried Rice Chino',origin:'china',time:'20 min',diff:'Fácil',
+   desc:'Arroz frito al wok con verduras, huevo y salsa de soja.',
+   ings:['Arroz jazmín','Huevo','Zanahoria','Pimiento verde','Cebolla de verdeo','Salsa de soja','Aceite de sésamo','Ajo','Aceite vegetal'],
+   steps:['Usar arroz cocido del día anterior (el frío funciona mucho mejor).','Calentar el wok a fuego muy alto con aceite hasta que humee.','Saltear el ajo, zanahoria y pimiento verde por 2 minutos.','Agregar el arroz y revolver constantemente 3 minutos.','Hacer espacio, romper los huevos, mezclar con el arroz y terminar con salsa de soja y aceite de sésamo.']},
+  {id:8,name:'Miso Ramen',origin:'japonesa',time:'30 min',diff:'Fácil',
+   desc:'Sopa reconfortante de miso con fideos ramen, tofu y verduras.',
+   ings:['Fideos ramen','Tofu','Pasta de miso','Dashi en polvo','Bok choy','Cebolla de verdeo','Aceite de sésamo','Semillas de sésamo'],
+   steps:['Preparar el dashi disolviendo el polvo en agua caliente según instrucciones.','Diluir la pasta de miso en el dashi caliente (nunca hervir después de agregar el miso).','Agregar el tofu en cubos y el bok choy; cocinar 3 minutos.','Cocinar los fideos ramen por separado, escurrir bien.','Servir los fideos en el caldo y decorar con cebolla de verdeo, sésamo y aceite de sésamo.']},
+  {id:9,name:'Pollo General Tso',origin:'china',time:'35 min',diff:'Media',
+   desc:'Pollo crujiente bañado en salsa agridulce con toque picante.',
+   ings:['Pollo','Salsa de soja','Salsa hoisin','Azúcar','Vinagre de arroz','Ajo','Jengibre','Copos de chile','Maicena','Aceite vegetal','Cebolla de verdeo'],
+   steps:['Cortar el pollo en cubos y rebozar generosamente con maicena.','Freír el pollo en aceite abundante hasta dorado y crocante por todos lados.','En otra sartén, saltear ajo y jengibre picado 30 segundos.','Agregar salsa de soja, hoisin, azúcar, vinagre y copos de chile, llevar a hervor.','Incorporar el pollo frito a la salsa, mezclar y servir con cebolla de verdeo.']},
+  {id:10,name:'Bulgogi',origin:'coreana',time:'25 min',diff:'Fácil',
+   desc:'Carne de res marinada y asada, de sabor dulce y ahumado.',
+   ings:['Carne de res','Salsa de soja','Azúcar','Aceite de sésamo','Ajo','Jengibre','Pimiento rojo','Cebolla de verdeo','Semillas de sésamo','Arroz jazmín'],
+   steps:['Cortar la carne en láminas finas y marinar con salsa de soja, azúcar, aceite de sésamo, ajo y jengibre por mínimo 30 minutos.','Calentar la sartén o plancha a fuego muy alto.','Asar la carne en una sola capa 2-3 minutos por lado hasta caramelizar.','Agregar el pimiento rojo en los últimos 2 minutos.','Servir sobre arroz con cebolla de verdeo y semillas de sésamo.']},
+  {id:11,name:'Tom Kha Gai',origin:'tailandesa',time:'25 min',diff:'Fácil',
+   desc:'Sopa tailandesa de leche de coco con pollo, setas y jengibre.',
+   ings:['Pollo','Leche de coco','Setas shiitake','Jengibre','Salsa de pescado','Azúcar','Caldo de pollo','Cebolla de verdeo'],
+   steps:['Llevar el caldo de pollo a hervor con rodajas gruesas de jengibre.','Agregar la leche de coco y reducir a fuego suave.','Incorporar el pollo en trozos y las setas; cocinar 10 minutos.','Condimentar con salsa de pescado y azúcar al gusto.','Servir decorado con cebolla de verdeo y jugo de lima.']},
+  {id:12,name:'Mapo Tofu',origin:'china',time:'20 min',diff:'Fácil',
+   desc:'Tofu sedoso en salsa picante de cerdo con pasta de miso.',
+   ings:['Tofu','Cerdo','Pasta de miso','Salsa de soja','Ajo','Jengibre','Copos de chile','Aceite de chile','Caldo de pollo','Maicena','Cebolla de verdeo'],
+   steps:['Saltear el cerdo picado con ajo y jengibre hasta que cambie de color.','Agregar pasta de miso y copos de chile, mezclar bien.','Incorporar el caldo de pollo y salsa de soja, llevar a hervor suave.','Agregar el tofu en cubos con cuidado para no romperlo.','Espesar con maicena disuelta en agua fría y terminar con aceite de chile y cebolla de verdeo.']}
+];
+
+// ── STATE ──────────────────────────────────────────────
+let pantry = {};
+let currentUser = null;
+let activeFilter = 'todas';
+let activeRecipeId = null;
+let randomId = null;
+
+// ── AUTH ──────────────────────────────────────────────
+function tryLogin(){
+  const u = document.getElementById('au').value.trim();
+  const p = document.getElementById('ap').value.trim();
+  const ok = USERS.find(x => x.u === u && x.p === p);
+  const err = document.getElementById('auth-err');
+  if(!ok){ err.style.display='flex'; return; }
+  err.style.display='none';
+  currentUser = u;
+  loadPantry();
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('u-avatar').textContent = u[0].toUpperCase();
+  document.getElementById('u-label').textContent = u;
+  renderRecipes();
+  renderPantry();
+}
+
+function logout(){
+  savePantry();
+  currentUser = null; pantry = {}; activeFilter = 'todas';
+  document.getElementById('app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('au').value='';
+  document.getElementById('ap').value='';
+}
+
+document.getElementById('login-btn').addEventListener('click', tryLogin);
+document.getElementById('ap').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+document.getElementById('au').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('ap').focus(); });
+
+// ── STORAGE ──────────────────────────────────────────────
+function loadPantry(){
+  try{ const d = localStorage.getItem('ak_pantry_'+currentUser); if(d) pantry=JSON.parse(d); }catch(e){}
+}
+function savePantry(){
+  try{ localStorage.setItem('ak_pantry_'+currentUser, JSON.stringify(pantry)); }catch(e){}
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function qty(item){ return parseInt(pantry[item])||0; }
+
+function matchInfo(recipe){
+  const have = recipe.ings.filter(i => qty(i)>0);
+  const miss  = recipe.ings.filter(i => qty(i)===0);
+  return { have, miss, ok: miss.length===0, partial: have.length>0 && miss.length>0 };
+}
+
+// ── NAV ──────────────────────────────────────────────
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  if(page==='alacena') renderPantry();
+  if(page==='recetas') renderRecipes();
+}
+
+// ── RECIPES ──────────────────────────────────────────────
+function setFilter(btn){
+  activeFilter = btn.dataset.f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderRecipes();
+}
+
+function renderRecipes(){
+  let list = RECIPES;
+  if(activeFilter==='posible') list = RECIPES.filter(r=>matchInfo(r).ok);
+  else if(activeFilter!=='todas') list = RECIPES.filter(r=>r.origin===activeFilter);
+
+  const grid = document.getElementById('recipe-grid');
+  if(!list.length){
+    grid.innerHTML = '<div class="empty"><i class="ti ti-search-off"></i><p>No hay recetas para este filtro. Agregá más ingredientes a tu alacena.</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(r=>{
+    const m = matchInfo(r);
+    let matchHTML = '';
+    if(m.ok) matchHTML = '<div class="match-ok"><i class="ti ti-circle-check" style="vertical-align:-2px"></i> Podés hacerla ahora</div>';
+    else if(m.partial) matchHTML = `<div class="match-partial"><i class="ti ti-circle-half-2" style="vertical-align:-2px"></i> Faltan ${m.miss.length} ingrediente${m.miss.length>1?'s':''}</div>`;
+    else matchHTML = `<div class="match-none">Faltan ${m.miss.length} ingredientes</div>`;
+
+    const lockBadge = m.ok ? '' : '<div class="lock-badge"><i class="ti ti-lock" style="font-size:11px"></i> Incompleto</div>';
+    return `<div class="recipe-card" onclick="openRecipe(${r.id})">
+      <div class="recipe-thumb">
+        <i class="ti ti-photo"></i>
+        <span class="recipe-thumb-label">[ imagen — placeholder ]</span>
+        ${lockBadge}
+      </div>
+      <div class="recipe-body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.3rem">
+          <h3>${r.name}</h3>
+          <span class="recipe-origin">${r.origin}</span>
+        </div>
+        <div class="recipe-meta">
+          <span><i class="ti ti-clock" style="font-size:13px"></i>${r.time}</span>
+          <span><i class="ti ti-flame" style="font-size:13px"></i>${r.diff}</span>
+        </div>
+        <p class="recipe-desc">${r.desc}</p>
+        ${matchHTML}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ──────────────────────────────────────────────
+function openRecipe(id){
+  const r = RECIPES.find(x=>x.id===id);
+  if(!r) return;
+  activeRecipeId = id;
+  const m = matchInfo(r);
+  document.getElementById('m-title').textContent = r.name;
+  document.getElementById('m-chips').innerHTML =
+    `<span class="modal-chip"><i class="ti ti-clock"></i>${r.time}</span>
+     <span class="modal-chip"><i class="ti ti-flame"></i>${r.diff}</span>
+     <span class="modal-chip"><i class="ti ti-map-pin"></i>${r.origin.charAt(0).toUpperCase()+r.origin.slice(1)}</span>`;
+  document.getElementById('m-desc').textContent = r.desc;
+  document.getElementById('m-ings').innerHTML = r.ings.map(i=>
+    `<span class="ing-tag ${qty(i)===0?'miss':''}">${i}${qty(i)===0?' ✗':' ✓'}</span>`
+  ).join('');
+  document.getElementById('m-steps').innerHTML = r.steps.map(s=>`<li>${s}</li>`).join('');
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+document.getElementById('modal-bg').addEventListener('click', e=>{
+  if(e.target===document.getElementById('modal-bg')) closeModal();
+});
+
+// ── RANDOM ──────────────────────────────────────────────
+function showRandom(){
+  const pool = RECIPES.filter(r=>matchInfo(r).ok);
+  const src  = pool.length > 0 ? pool : RECIPES;
+  const r    = src[Math.floor(Math.random()*src.length)];
+  randomId   = r.id;
+  const m    = matchInfo(r);
+  document.getElementById('r-name').textContent = r.name;
+  document.getElementById('r-desc').textContent = r.desc +
+    (m.ok ? ' ✓ Tenés todos los ingredientes.' :
+     ` Te faltan: ${m.miss.slice(0,3).join(', ')}${m.miss.length>3?'...':''}.`);
+  document.getElementById('rand-bg').classList.add('open');
+}
+
+function openFromRandom(){
+  document.getElementById('rand-bg').classList.remove('open');
+  if(randomId) openRecipe(randomId);
+}
+
+document.getElementById('rand-bg').addEventListener('click', e=>{
+  if(e.target===document.getElementById('rand-bg')) document.getElementById('rand-bg').classList.remove('open');
+});
+
+// ── PANTRY ──────────────────────────────────────────────
+function renderPantry(){
+  const q = document.getElementById('pantry-q').value.toLowerCase();
+  const hasStock = Object.values(pantry).filter(v=>parseInt(v)>0).length;
+  const posibles = RECIPES.filter(r=>matchInfo(r).ok).length;
+  const total = CATS.reduce((a,c)=>a+c.items.length, 0);
+  document.getElementById('s-disponibles').textContent = hasStock;
+  document.getElementById('s-posibles').textContent = posibles;
+  document.getElementById('s-total').textContent = total;
+
+  let html = '';
+  for(const cat of CATS){
+    const items = q ? cat.items.filter(i=>i.toLowerCase().includes(q)) : cat.items;
+    if(!items.length) continue;
+    const stocked = items.filter(i=>qty(i)>0).length;
+    html += `<div>
+      <div class="cat-header">
+        <h3>${cat.cat}</h3>
+        <span class="cat-count">${stocked} / ${items.length}</span>
+      </div>
+      <div class="pantry-grid">${items.map(item=>{
+        const n = qty(item);
+        const safe = item.replace(/[^a-z0-9]/gi,'_');
+        return `<div class="p-item ${n>0?'stocked':''}" id="pi_${safe}">
+          <span class="p-name">${item}</span>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="chg('${item.replace(/'/g,"\\'")}', -1)">−</button>
+            <input class="qty-inp" type="number" min="0" max="99" value="${n}"
+              onchange="set('${item.replace(/'/g,"\\'")}', this.value)"
+              onfocus="this.select()"
+              aria-label="Cantidad de ${item}">
+            <button class="qty-btn" onclick="chg('${item.replace(/'/g,"\\'")}', 1)">+</button>
+          </div>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }
+  document.getElementById('pantry-cats').innerHTML = html || '<div class="empty"><i class="ti ti-search-off"></i><p>No se encontraron ingredientes</p></div>';
+}
+
+function chg(item, delta){
+  pantry[item] = Math.max(0, qty(item)+delta);
+  savePantry();
+  renderPantry();
+  renderRecipes();
+}
+function set(item, val){
+  pantry[item] = Math.max(0, parseInt(val)||0);
+  savePantry();
+  renderPantry();
+  renderRecipes();
+}
+</script>
+</body>
+</html>
